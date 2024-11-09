@@ -2,7 +2,6 @@
 
 namespace Apatiu\LaravelStrapi;
 
-use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Apatiu\LaravelStrapi\Commands\LaravelStrapiCommand;
@@ -19,10 +18,6 @@ class LaravelStrapiServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-strapi')
             ->hasConfigFile()
-            ->hasCommand(LaravelStrapiCommand::class)
-            ->hasInstallCommand(function(InstallCommand $command) {
-                $command
-                    ->publishConfigFile();
-            });
+            ->hasCommand(LaravelStrapiCommand::class);
     }
 }
