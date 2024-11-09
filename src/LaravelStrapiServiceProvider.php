@@ -2,9 +2,9 @@
 
 namespace Apatiu\LaravelStrapi;
 
+use Apatiu\LaravelStrapi\Commands\LaravelStrapiCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Apatiu\LaravelStrapi\Commands\LaravelStrapiCommand;
 
 class LaravelStrapiServiceProvider extends PackageServiceProvider
 {

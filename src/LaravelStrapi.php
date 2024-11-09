@@ -24,8 +24,11 @@ class LaravelStrapi
     public const CACHE_KEY = 'laravel-strapi-cache';
 
     private string $strapiUrl;
+
     private int $cacheTime;
+
     private $token;
+
     private array $headers = [];
 
     public function __construct()
@@ -34,26 +37,26 @@ class LaravelStrapi
         $this->cacheTime = config('strapi.cacheTime');
         $this->token = config('strapi.token');
 
-        if (!empty($this->token)) {
-            $this->headers['Authorization'] = 'Bearer ' . $this->token;
+        if (! empty($this->token)) {
+            $this->headers['Authorization'] = 'Bearer '.$this->token;
         }
     }
 
     public function collection(string $type, $sortKey = 'id', $sortOrder = 'DESC', $limit = 20, $start = 0, $fullUrls = true, array|string $populate = [], array $queryData = []): array
     {
-        $endpoint = $this->strapiUrl . '/' . $type;
+        $endpoint = $this->strapiUrl.'/'.$type;
 
-        $queryData['sort'][0] = $sortKey . ':' . $sortOrder;
+        $queryData['sort'][0] = $sortKey.':'.$sortOrder;
         $queryData['pagination']['limit'] = $limit;
         $queryData['pagination']['start'] = $start;
 
-        if (!empty($populate)) {
+        if (! empty($populate)) {
             $queryData['populate'] = $populate;
         }
 
-        $endpoint .= '?' . http_build_query($queryData);
+        $endpoint .= '?'.http_build_query($queryData);
 
-        $cacheKey = self::CACHE_KEY . '.' . __FUNCTION__ . '.' . encrypt($endpoint);
+        $cacheKey = self::CACHE_KEY.'.'.__FUNCTION__.'.'.encrypt($endpoint);
 
         // Fetch and cache the collection type
         $return = Cache::remember($cacheKey, $this->cacheTime, function () use ($endpoint) {
@@ -65,14 +68,14 @@ class LaravelStrapi
         if (isset($return['statusCode']) && $return['statusCode'] >= 400) {
             Cache::forget($cacheKey);
 
-            throw new PermissionDenied('Strapi returned a ' . $return['statusCode']);
+            throw new PermissionDenied('Strapi returned a '.$return['statusCode']);
         }
 
-        if (!is_array($return)) {
+        if (! is_array($return)) {
             Cache::forget($cacheKey);
 
-            if (null === $return) {
-                throw new NotFound('The requested single entry (' . $type . ') was null');
+            if ($return === null) {
+                throw new NotFound('The requested single entry ('.$type.') was null');
             }
 
             throw new UnknownError('An unknown Strapi error was returned');
@@ -88,9 +91,9 @@ class LaravelStrapi
 
     public function collectionCount(string $type): int
     {
-        $endpoint = $this->strapiUrl . '/' . $type . '/count';
+        $endpoint = $this->strapiUrl.'/'.$type.'/count';
 
-        $cacheKey = self::CACHE_KEY . '.' . __FUNCTION__ . '.' . encrypt($endpoint);
+        $cacheKey = self::CACHE_KEY.'.'.__FUNCTION__.'.'.encrypt($endpoint);
 
         return Cache::remember($cacheKey, $this->cacheTime, function () use ($endpoint) {
             $response = Http::withHeaders($this->headers)->get($endpoint);
@@ -101,15 +104,15 @@ class LaravelStrapi
 
     public function entry(string $type, string $id, $fullUrls = true, array|string $populate = [], array $queryData = []): array
     {
-        $endpoint = $this->strapiUrl . '/' . $type . '/' . $id;
+        $endpoint = $this->strapiUrl.'/'.$type.'/'.$id;
 
-        if (!empty($populate)) {
+        if (! empty($populate)) {
             $queryData['populate'] = $populate;
         }
 
-        $endpoint .= '?' . http_build_query($queryData);
+        $endpoint .= '?'.http_build_query($queryData);
 
-        $cacheKey = self::CACHE_KEY . '.' . __FUNCTION__ . '.' . encrypt($endpoint);
+        $cacheKey = self::CACHE_KEY.'.'.__FUNCTION__.'.'.encrypt($endpoint);
 
         $return = Cache::remember($cacheKey, $this->cacheTime, function () use ($endpoint) {
             $response = Http::withHeaders($this->headers)->get($endpoint);
@@ -120,14 +123,14 @@ class LaravelStrapi
         if (isset($return['statusCode']) && $return['statusCode'] >= 400) {
             Cache::forget($cacheKey);
 
-            throw new PermissionDenied('Strapi returned a ' . $return['statusCode']);
+            throw new PermissionDenied('Strapi returned a '.$return['statusCode']);
         }
 
-        if (!is_array($return)) {
+        if (! is_array($return)) {
             Cache::forget($cacheKey);
 
-            if (null === $return) {
-                throw new NotFound('The requested single entry (' . $type . ') was null');
+            if ($return === null) {
+                throw new NotFound('The requested single entry ('.$type.') was null');
             }
 
             throw new UnknownError('An unknown Strapi error was returned');
@@ -142,17 +145,17 @@ class LaravelStrapi
 
     public function entriesByField(string $type, string $fieldName, $fieldValue, $fullUrls = true, array|string $populate = [], array $queryData = []): array
     {
-        $endpoint = $this->strapiUrl . '/' . $type;
+        $endpoint = $this->strapiUrl.'/'.$type;
 
         $queryData['filters'][$fieldName]['$eq'] = $fieldValue;
 
-        if (!empty($populate)) {
+        if (! empty($populate)) {
             $queryData['populate'] = $populate;
         }
 
-        $endpoint .= '?' . http_build_query($queryData);
+        $endpoint .= '?'.http_build_query($queryData);
 
-        $cacheKey = self::CACHE_KEY . '.' . __FUNCTION__ . '.' . encrypt($endpoint);
+        $cacheKey = self::CACHE_KEY.'.'.__FUNCTION__.'.'.encrypt($endpoint);
 
         $entries = Cache::remember($cacheKey, $this->cacheTime, function () use ($endpoint) {
             $response = Http::withHeaders($this->headers)->get($endpoint);
@@ -163,14 +166,14 @@ class LaravelStrapi
         if (isset($entries['statusCode']) && $entries['statusCode'] >= 400) {
             Cache::forget($cacheKey);
 
-            throw new PermissionDenied('Strapi returned a ' . $entries['statusCode']);
+            throw new PermissionDenied('Strapi returned a '.$entries['statusCode']);
         }
 
-        if (!is_array($entries)) {
+        if (! is_array($entries)) {
             Cache::forget($cacheKey);
 
-            if (null === $entries) {
-                throw new NotFound('The requested entries by field (' . $type . ') were not found');
+            if ($entries === null) {
+                throw new NotFound('The requested entries by field ('.$type.') were not found');
             }
 
             throw new UnknownError('An unknown Strapi error was returned');
@@ -183,17 +186,17 @@ class LaravelStrapi
         return $entries;
     }
 
-    public function single(string $type, string $pluck = null, $fullUrls = true, array|string $populate = [], array $queryData = []): array
+    public function single(string $type, ?string $pluck = null, $fullUrls = true, array|string $populate = [], array $queryData = []): array
     {
-        $endpoint = $this->strapiUrl . '/' . $type;
+        $endpoint = $this->strapiUrl.'/'.$type;
 
-        if (!empty($populate)) {
+        if (! empty($populate)) {
             $queryData['populate'] = $populate;
         }
 
-        $endpoint .= '?' . http_build_query($queryData);
+        $endpoint .= '?'.http_build_query($queryData);
 
-        $cacheKey = self::CACHE_KEY . '.' . __FUNCTION__ . '.' . encrypt($endpoint);
+        $cacheKey = self::CACHE_KEY.'.'.__FUNCTION__.'.'.encrypt($endpoint);
 
         // Fetch and cache the collection type
         $return = Cache::remember($cacheKey, $this->cacheTime, function () use ($endpoint) {
@@ -205,14 +208,14 @@ class LaravelStrapi
         if (isset($return['statusCode']) && $return['statusCode'] >= 400) {
             Cache::forget($cacheKey);
 
-            throw new PermissionDenied('Strapi returned a ' . $return['statusCode']);
+            throw new PermissionDenied('Strapi returned a '.$return['statusCode']);
         }
 
-        if (!is_array($return)) {
+        if (! is_array($return)) {
             Cache::forget($cacheKey);
 
-            if (null === $return) {
-                throw new NotFound('The requested single entry (' . $type . ') was null');
+            if ($return === null) {
+                throw new NotFound('The requested single entry ('.$type.') was null');
             }
 
             throw new UnknownError('An unknown Strapi error was returned');
@@ -223,7 +226,7 @@ class LaravelStrapi
             $return = $this->convertToFullUrls($return);
         }
 
-        if (null !== $pluck && isset($return[$pluck])) {
+        if ($pluck !== null && isset($return[$pluck])) {
             return $return[$pluck];
         }
 
@@ -256,7 +259,7 @@ class LaravelStrapi
      * This function adds the Strapi URL to the front of content in entries, collections, etc.
      * This is primarily used to change image URLs to actually point to Strapi.
      *
-     * @param mixed $array
+     * @param  mixed  $array
      */
     private function convertToFullUrls($array): array
     {
@@ -265,11 +268,11 @@ class LaravelStrapi
                 $array[$key] = $this->convertToFullUrls($item);
             }
 
-            if (!is_string($item) || empty($item)) {
+            if (! is_string($item) || empty($item)) {
                 continue;
             }
 
-            $array[$key] = preg_replace('/!\[(.*)\]\((.*)\)/', '![$1](' . config('strapi.url') . '$2)', $item);
+            $array[$key] = preg_replace('/!\[(.*)\]\((.*)\)/', '![$1]('.config('strapi.url').'$2)', $item);
         }
 
         return $array;
