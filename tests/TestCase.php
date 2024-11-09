@@ -2,9 +2,9 @@
 
 namespace Apatiu\LaravelStrapi\Tests;
 
+use Apatiu\LaravelStrapi\LaravelStrapiServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Apatiu\LaravelStrapi\LaravelStrapiServiceProvider;
 
 class TestCase extends Orchestra
 {
