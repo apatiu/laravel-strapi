@@ -99,7 +99,7 @@ class LaravelStrapi
         });
     }
 
-    public function entry(string $type, int $id, $fullUrls = true, array|string $populate = [], array $queryData = []): array
+    public function entry(string $type, string $id, $fullUrls = true, array|string $populate = [], array $queryData = []): array
     {
         $endpoint = $this->strapiUrl . '/' . $type . '/' . $id;
 
